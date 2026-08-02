@@ -1,0 +1,10 @@
+{
+  "name": "ホイッスル！ラクロス審判試験ドリル",
+  "short_name": "ホイッスル！",
+  "description": "ラクロス審判試験の勉強アプリ。章別学習・にがて復習・もぎ試験",
+  "start_url": ".",
+  "display": "standalone",
+  "background_color": "#FBF4E8",
+  "theme_color": "#2E9E63",
+  "icons": []
+}

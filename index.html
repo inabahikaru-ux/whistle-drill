@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#2E9E63">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ホイッスル！">
+<link rel="manifest" href="manifest.json">
+<title>ホイッスル！｜ラクロス審判試験ドリル</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+Rounded+1c:wght@500;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF4E8; --paper:#FFFFFF; --line:#EFE3CF;
+  --green:#2E9E63; --green-d:#22794B; --green-l:#E3F4EA;
+  --yellow:#FFC532; --yellow-d:#E0A612; --yellow-l:#FFF3D4;
+  --coral:#E8604C; --coral-d:#C24634; --coral-l:#FDEAE6;
+  --ink:#463F33; --sub:#7A6F5D; --mut:#B0A38D;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:"M PLUS Rounded 1c","Hiragino Maru Gothic ProN",sans-serif;background:var(--cream);color:var(--ink);font-size:15px;line-height:1.8;font-weight:500}
+main{max-width:560px;margin:0 auto;padding:14px 16px 92px}
+.hidden{display:none!important}
+b,strong,h1,h2,h3{font-weight:800}
+/* header */
+#top{max-width:560px;margin:0 auto;padding:14px 16px 0;display:flex;align-items:center;justify-content:space-between}
+#top .ttl{font-size:18px;font-weight:800;color:var(--green);letter-spacing:.02em}
+#top .streak{background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:4px 14px;font-size:12px;font-weight:700;color:var(--sub)}
+#top .streak b{color:var(--coral);font-size:15px}
+/* tabs */
+#tabs{position:fixed;bottom:0;left:0;right:0;z-index:20;background:var(--paper);border-top:2px solid var(--line);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+.tab{flex:1;text-align:center;padding:8px 0 9px;font-size:11px;font-weight:700;color:var(--mut);cursor:pointer;border:none;background:none;font-family:inherit}
+.tab .em{display:block;font-size:20px;line-height:1.3;filter:grayscale(1);opacity:.55}
+.tab.on{color:var(--green)}
+.tab.on .em{filter:none;opacity:1}
+/* cards & buttons */
+.card{background:var(--paper);border:2px solid var(--line);border-radius:20px;padding:18px}
+.btn{display:block;width:100%;background:var(--green);color:#fff;font-size:16px;font-weight:800;border:none;border-radius:16px;padding:15px 0;cursor:pointer;font-family:inherit;box-shadow:0 5px 0 var(--green-d);transition:transform .06s}
+.btn:active{transform:translateY(4px);box-shadow:0 1px 0 var(--green-d)}
+.btn.yellow{background:var(--yellow);color:#7A5800;box-shadow:0 5px 0 var(--yellow-d)}
+.btn.yellow:active{box-shadow:0 1px 0 var(--yellow-d)}
+.btn.ghost{background:var(--paper);color:var(--green);box-shadow:0 5px 0 var(--line);border:2px solid var(--line)}
+.btn.ghost:active{box-shadow:0 1px 0 var(--line)}
+.btn.sm{font-size:13px;padding:11px 0;border-radius:13px}
+/* home */
+.hello{display:flex;gap:14px;align-items:center;margin:10px 0 18px}
+.hello .msc{flex-shrink:0}
+.bubble{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 16px;font-size:13.5px;position:relative;font-weight:700;color:var(--sub)}
+.bubble::before{content:"";position:absolute;left:-9px;top:50%;transform:translateY(-50%);border:8px solid transparent;border-right-color:var(--line)}
+.bubble::after{content:"";position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:7px solid transparent;border-right-color:var(--paper)}
+.bubble b{color:var(--green)}
+.bigstat{display:flex;gap:10px;margin-bottom:18px}
+.stat{flex:1;background:var(--paper);border:2px solid var(--line);border-radius:18px;text-align:center;padding:12px 4px}
+.stat .v{font-size:24px;font-weight:800;color:var(--green);line-height:1.3}
+.stat .v small{font-size:12px;color:var(--mut)}
+.stat .l{font-size:11px;color:var(--mut);font-weight:700}
+.secttl{font-size:15px;font-weight:800;margin:22px 0 10px;display:flex;align-items:center;gap:6px}
+.secttl small{margin-left:auto;font-size:11px;color:var(--mut);font-weight:700}
+.chrow{display:flex;align-items:center;gap:12px;background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:12px 14px;margin-bottom:9px;cursor:pointer;transition:transform .06s}
+.chrow:active{transform:scale(.98)}
+.chrow .em{font-size:24px;flex-shrink:0}
+.chrow .nm{font-size:13.5px;font-weight:800;line-height:1.45}
+.chrow .sb{font-size:10.5px;color:var(--mut);font-weight:700}
+.ring{margin-left:auto;flex-shrink:0;position:relative;width:44px;height:44px}
+.ring svg{transform:rotate(-90deg)}
+.ring .pct{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:800;color:var(--green)}
+/* study screen */
+#study{position:fixed;inset:0;z-index:40;background:var(--cream);display:flex;flex-direction:column;overflow-y:auto}
+.stop{display:flex;align-items:center;gap:12px;padding:14px 16px;max-width:560px;margin:0 auto;width:100%}
+.stop button{background:none;border:none;font-size:22px;color:var(--mut);cursor:pointer;font-family:inherit;line-height:1}
+.pbar{flex:1;height:12px;background:#EFE3CF;border-radius:99px;overflow:hidden}
+.pbar i{display:block;height:100%;background:var(--yellow);border-radius:99px;transition:width .35s ease}
+.timer{font-size:14px;font-weight:800;color:var(--sub);min-width:52px;text-align:right}
+.timer.warn{color:var(--coral)}
+.swrap{flex:1;width:100%;max-width:560px;margin:0 auto;padding:6px 16px 24px;display:flex;flex-direction:column}
+.qmeta{display:flex;gap:8px;margin-bottom:10px}
+.pill{font-size:11px;font-weight:800;background:var(--paper);border:2px solid var(--line);border-radius:999px;padding:3px 12px;color:var(--sub)}
+.pill.g{background:var(--green-l);border-color:var(--green-l);color:var(--green-d)}
+.qcard{background:var(--paper);border:2px solid var(--line);border-radius:22px;padding:22px 20px;font-size:16px;font-weight:700;line-height:2;animation:pop .3s ease}
+@keyframes pop{from{opacity:0;transform:translateY(14px) scale(.98)}to{opacity:1;transform:none}}
+.oxrow{display:flex;gap:12px;margin-top:16px}
+.ox{flex:1;font-family:inherit;cursor:pointer;border:none;border-radius:20px;padding:20px 0 16px;font-size:15px;font-weight:800;transition:transform .06s}
+.ox .mk{display:block;font-size:34px;line-height:1.2;font-weight:800}
+.ox.maru{background:var(--green-l);color:var(--green-d);box-shadow:0 5px 0 #C8E5D3}
+.ox.batu{background:var(--coral-l);color:var(--coral-d);box-shadow:0 5px 0 #F2CFC7}
+.ox:active{transform:translateY(4px);box-shadow:none}
+.ox[disabled]{opacity:.45;pointer-events:none}
+/* feedback */
+.fb{border-radius:22px;padding:16px 18px;margin-top:16px;display:flex;gap:14px;align-items:flex-start;animation:pop .3s ease}
+.fb.ok{background:var(--green-l)}
+.fb.ng{background:var(--coral-l)}
+.fb .fbt{font-size:17px;font-weight:800}
+.fb.ok .fbt{color:var(--green-d)}
+.fb.ng .fbt{color:var(--coral-d)}
+.fb .fbe{font-size:13.5px;color:var(--ink);margin-top:4px}
+.fb .src{font-size:11px;color:var(--mut);font-weight:700;margin-top:6px}
+.nextwrap{margin-top:auto;padding-top:16px}
+/* result */
+.result{text-align:center;padding:28px 0 8px;animation:pop .4s ease}
+.result h2{font-size:24px;margin:12px 0 2px}
+.result .sc{font-size:44px;font-weight:800;color:var(--green);line-height:1.3}
+.result .sc small{font-size:16px;color:var(--mut)}
+.result p{font-size:13px;color:var(--sub);font-weight:700}
+.pass{color:var(--green-d)}.fail{color:var(--coral-d)}
+.wronglist{margin-top:16px;text-align:left}
+.wrow{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:12px 14px;margin-bottom:8px;font-size:12.5px;font-weight:700;cursor:pointer}
+.wrow .no{color:var(--coral-d);font-size:11px;font-weight:800}
+/* library */
+.shelf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.book{background:var(--paper);border:2px solid var(--line);border-radius:18px;padding:14px;cursor:pointer;transition:transform .06s;border-bottom-width:5px}
+.book:active{transform:scale(.97)}
+.book .em{font-size:26px}
+.book .nm{font-size:12.5px;font-weight:800;line-height:1.5;margin-top:4px}
+.book .ct{font-size:10.5px;color:var(--mut);font-weight:700}
+.libdesc{font-size:12.5px;color:var(--sub);font-weight:700;margin:2px 2px 14px}
+/* sheet */
+#sheet{position:fixed;inset:0;z-index:50;background:rgba(70,63,51,.45);display:flex;align-items:flex-end;justify-content:center}
+.shin{background:var(--cream);border-radius:24px 24px 0 0;width:100%;max-width:560px;max-height:88vh;display:flex;flex-direction:column;animation:rise .3s ease}
+@keyframes rise{from{transform:translateY(50px);opacity:0}to{transform:none;opacity:1}}
+.shhead{display:flex;align-items:center;gap:10px;padding:16px 18px 12px}
+.shhead .t{font-size:16px;font-weight:800;flex:1}
+.shhead button{background:var(--paper);border:2px solid var(--line);width:32px;height:32px;border-radius:50%;font-size:13px;cursor:pointer;color:var(--sub);font-family:inherit;font-weight:800}
+.shbody{overflow-y:auto;padding:2px 18px calc(24px + env(safe-area-inset-bottom))}
+.qitem{background:var(--paper);border:2px solid var(--line);border-radius:16px;padding:13px 15px;margin-bottom:9px;cursor:pointer}
+.qitem .no{font-size:10.5px;font-weight:800;color:var(--mut)}
+.qitem .qq{font-size:12.5px;font-weight:700;line-height:1.7}
+.qitem .st{font-size:10.5px;font-weight:800}
+.qitem .st.ok{color:var(--green)}
+.qitem .st.ng{color:var(--coral)}
+.qitem .st.no{color:var(--mut)}
+</style>
+</head>
+<body>
+<div id="top">
+  <span class="ttl">ホイッスル！</span>
+  <span class="streak">🔥 <b id="stk">0</b> 日連続</span>
+</div>
+
+<main>
+  <div id="tab-home"></div>
+  <div id="tab-mock" class="hidden"></div>
+  <div id="tab-lib" class="hidden"></div>
+  <div id="tab-rec" class="hidden"></div>
+</main>
+
+<nav id="tabs">
+  <button class="tab on" data-t="home" onclick="tab('home')"><span class="em">🏠</span>ホーム</button>
+  <button class="tab" data-t="mock" onclick="tab('mock')"><span class="em">📝</span>もぎ試験</button>
+  <button class="tab" data-t="lib" onclick="tab('lib')"><span class="em">📚</span>としょかん</button>
+  <button class="tab" data-t="rec" onclick="tab('rec')"><span class="em">🌱</span>きろく</button>
+</nav>
+
+<div id="study" class="hidden"></div>
+<div id="sheet" class="hidden"></div>
+
+<script src="questions.js"></script>
+<script>
+const $=id=>document.getElementById(id);
+const CH_EMOJI={c15:'🏟️',c6:'🥍',c7:'🔄',c8:'🥅',c9:'⚠️',c10:'🚨',c11:'🟥',c12:'⏱️',c13:'✨'};
+const CH_DESC={
+ c15:'フィールドの大きさ、クロスや防具のきまり、チームと審判、試合時間。ぜんぶの土台になる章。',
+ c6:'フェイスオフ、アウトオブバウンズ、オフサイド…試合がどう進むかのルール。いちばん「試合が見えるようになる」章。',
+ c7:'交代はどこから？何人まで？シンプルだけど本番でよく問われる小さな章。',
+ c8:'クリースに入っていいのは誰？ゴーリーの特権はどこまで？攻防の境界線の章。',
+ c9:'30秒ペナルティの世界。プッシング、ホールディング、オフサイド…出題数No.1のいちばん大事な章。',
+ c10:'1〜3分ペナルティの世界。スラッシング、クロスチェック、イリーガルボディチェック。安全を守る章。',
+ c11:'退場になるほどの重大な反則。数は少ないけど確実に覚えたい章。',
+ c12:'ペナルティタイムの数え方、複数ファウルの処理。審判の実務そのものの章。',
+ c13:'ルールブックの最後にある「こんな時どうする？」集。応用問題の章。',
+};
+/* ---------- state ---------- */
+const S={
+ get seen(){return JSON.parse(localStorage.wh_seen||'{}')},
+ set seen(v){localStorage.wh_seen=JSON.stringify(v)},
+ mark(id,ok){const s=this.seen;s[id]=s[id]||{ok:0,ng:0};ok?s[id].ok++:s[id].ng++;this.seen=s;
+   const n=new Set(JSON.parse(localStorage.wh_ng||'[]'));ok?n.delete(id):n.add(id);localStorage.wh_ng=JSON.stringify([...n]);},
+ get nigate(){return JSON.parse(localStorage.wh_ng||'[]')},
+ get best(){return +(localStorage.wh_best||0)}, set best(v){localStorage.wh_best=v},
+ get mocks(){return JSON.parse(localStorage.wh_mocks||'[]')}, addMock(r){const m=this.mocks;m.push(r);localStorage.wh_mocks=JSON.stringify(m.slice(-20));},
+ touchStreak(){const today=new Date().toDateString();const last=localStorage.wh_last;let st=+(localStorage.wh_stk||0);
+   if(last===today)return st;
+   const y=new Date(Date.now()-864e5).toDateString();
+   st=(last===y)?st+1:1;localStorage.wh_stk=st;localStorage.wh_last=today;return st;},
+ get streak(){const today=new Date().toDateString();const y=new Date(Date.now()-864e5).toDateString();const last=localStorage.wh_last;
+   return (last===today||last===y)?+(localStorage.wh_stk||0):0;}
+};
+const byCh=k=>QUESTIONS.filter(q=>q.ch===k);
+const okCount=k=>{const s=S.seen;return byCh(k).filter(q=>s[q.id]&&s[q.id].ok>0).length;};
+const totalOk=()=>{const s=S.seen;return QUESTIONS.filter(q=>s[q.id]&&s[q.id].ok>0).length;};
+/* ---------- mascot ---------- */
+function mascot(mood,size){
+ const face={normal:'<circle cx="41" cy="46" r="3.6" fill="#463F33"/><circle cx="63" cy="46" r="3.6" fill="#463F33"/><path d="M44 58 Q52 64 60 58" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/>',
+  happy:'<path d="M36 46 Q41 41 46 46" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M58 46 Q63 41 68 46" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M42 57 Q52 67 62 57" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/>',
+  sad:'<path d="M37 48 L46 44" stroke="#463F33" stroke-width="3" stroke-linecap="round"/><path d="M67 48 L58 44" stroke="#463F33" stroke-width="3" stroke-linecap="round"/><path d="M44 62 Q52 56 60 62" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/>',
+ }[mood||'normal'];
+ const spark=mood==='happy'?'<text x="8" y="26" font-size="14">✨</text><text x="82" y="20" font-size="12">✨</text>':'';
+ return `<svg width="${size}" height="${size}" viewBox="0 0 104 104">
+ <circle cx="52" cy="52" r="38" fill="#FFD75E" stroke="#E0A612" stroke-width="3"/>
+ <path d="M22 38 Q52 22 82 38" stroke="#F3BC2F" stroke-width="2.5" fill="none"/>
+ <path d="M22 66 Q52 82 82 66" stroke="#F3BC2F" stroke-width="2.5" fill="none"/>
+ <circle cx="36" cy="55" r="4.5" fill="#FFAD5B" opacity=".55"/><circle cx="68" cy="55" r="4.5" fill="#FFAD5B" opacity=".55"/>
+ ${face}
+ <g transform="translate(70,72) rotate(18)"><rect x="0" y="0" width="16" height="10" rx="5" fill="#8E9BAE" stroke="#6E7B8E" stroke-width="2"/><circle cx="17" cy="8" r="6.5" fill="#8E9BAE" stroke="#6E7B8E" stroke-width="2"/><circle cx="17" cy="8" r="2" fill="#5A6678"/></g>
+ <path d="M74 74 Q66 60 58 34" stroke="#E8604C" stroke-width="2.5" fill="none"/>
+ ${spark}</svg>`;
+}
+/* ---------- tabs ---------- */
+function tab(t){
+ ['home','mock','lib','rec'].forEach(x=>$('tab-'+x).classList.toggle('hidden',x!==t));
+ document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('on',b.dataset.t===t));
+ if(t==='home')home(); if(t==='mock')mock(); if(t==='lib')lib(); if(t==='rec')rec();
+ scrollTo(0,0);
+}
+/* ---------- home ---------- */
+function ring(pct){
+ const r=17,c=2*Math.PI*r;
+ return `<div class="ring"><svg width="44" height="44"><circle cx="22" cy="22" r="${r}" fill="none" stroke="#EFE3CF" stroke-width="5"/><circle cx="22" cy="22" r="${r}" fill="none" stroke="#2E9E63" stroke-width="5" stroke-linecap="round" stroke-dasharray="${c}" stroke-dashoffset="${c*(1-pct/100)}"/></svg><span class="pct">${pct}%</span></div>`;
+}
+function home(){
+ $('stk').textContent=S.streak;
+ const done=totalOk(),total=QUESTIONS.length,ng=S.nigate.length;
+ const msgs=[`きょうも<b>10問</b>だけ、やってみない？`, `合格ラインは<b>9割</b>。コツコツが最強だよ`, `にがては<b>宝もの</b>。復習で点になるよ`];
+ const msg=done===0?`はじめまして！まずは<b>10問</b>いってみよう`:msgs[new Date().getDate()%msgs.length];
+ let h=`<div class="hello"><span class="msc">${mascot('normal',86)}</span><div class="bubble">${msg}</div></div>`;
+ h+=`<div class="bigstat"><div class="stat"><div class="v">${done}<small> /${total}</small></div><div class="l">クリアした問題</div></div><div class="stat"><div class="v">${ng}</div><div class="l">にがて</div></div><div class="stat"><div class="v">${S.best}<small> /50</small></div><div class="l">もぎ最高点</div></div></div>`;
+ h+=`<button class="btn yellow" onclick="startDaily()">🥍 きょうの10問をはじめる</button>`;
+ if(ng>0)h+=`<div style="height:10px"></div><button class="btn ghost sm" onclick="startNigate()">💪 にがて${Math.min(ng,10)}問をやっつける</button>`;
+ h+=`<div class="secttl">📖 章べつに勉強する<small>ぜんぶで${total}問</small></div>`;
+ QMETA.chapters.forEach(c=>{
+   const pct=c.count?Math.round(okCount(c.key)/c.count*100):0;
+   h+=`<div class="chrow" onclick="startChapter('${c.key}')"><span class="em">${CH_EMOJI[c.key]}</span><div><div class="nm">${c.name}</div><div class="sb">${c.sub}・${c.count}問</div></div>${ring(pct)}</div>`;
+ });
+ $('tab-home').innerHTML=h;
+}
+/* ---------- study session ---------- */
+let SS=null;
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+function startDaily(){
+ const s=S.seen;
+ const fresh=shuffle(QUESTIONS.filter(q=>!s[q.id]));
+ const rest=shuffle(QUESTIONS.filter(q=>s[q.id]));
+ openStudy(fresh.concat(rest).slice(0,10),'きょうの10問',false);
+}
+function startNigate(){
+ const ids=new Set(S.nigate);
+ openStudy(shuffle(QUESTIONS.filter(q=>ids.has(q.id))).slice(0,10),'にがて復習',false);
+}
+function startChapter(k){openStudy(shuffle(byCh(k)),QMETA.chapters.find(c=>c.key===k).name,false);}
+function startMock(){openStudy(shuffle(QUESTIONS).slice(0,50),'もぎ試験',true);}
+function openStudy(qs,title,isMock){
+ if(!qs.length)return;
+ SS={qs,i:0,ok:0,wrong:[],title,mock:isMock,answered:false,deadline:isMock?Date.now()+40*60*1000:null,timerId:null};
+ $('study').classList.remove('hidden');document.body.style.overflow='hidden';
+ if(isMock)SS.timerId=setInterval(tick,1000);
+ renderQ();
+}
+function closeStudy(){if(SS&&SS.timerId)clearInterval(SS.timerId);$('study').classList.add('hidden');document.body.style.overflow='';tab(SS&&SS.mock?'mock':'home');SS=null;}
+function tick(){
+ if(!SS)return;
+ const left=Math.max(0,SS.deadline-Date.now());
+ const el=$('tmr');if(el){const m=Math.floor(left/60000),s=Math.floor(left%60000/1000);el.textContent=`${m}:${String(s).padStart(2,'0')}`;el.classList.toggle('warn',left<5*60*1000);}
+ if(left<=0){clearInterval(SS.timerId);finish();}
+}
+function renderQ(){
+ const q=SS.qs[SS.i];
+ const pct=Math.round(SS.i/SS.qs.length*100);
+ let h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:${pct}%"></i></div>${SS.mock?`<span class="timer" id="tmr">40:00</span>`:`<span class="timer">${SS.i+1}/${SS.qs.length}</span>`}</div>
+ <div class="swrap"><div class="qmeta"><span class="pill g">${QMETA.chapters.find(c=>c.key===q.ch).name}</span>${q.id?`<span class="pill">${q.id}</span>`:''}</div>
+ <div class="qcard">${q.q}</div>
+ <div class="oxrow"><button class="ox maru" id="oxm" onclick="answer(1)"><span class="mk">○</span>正しい</button><button class="ox batu" id="oxb" onclick="answer(0)"><span class="mk">×</span>まちがい</button></div>
+ <div id="fb"></div><div class="nextwrap" id="nx"></div></div>`;
+ $('study').innerHTML=h;SS.answered=false;
+ if(SS.mock)tick();
+ scrollTo(0,0);$('study').scrollTop=0;
+}
+function answer(v){
+ if(SS.answered)return;SS.answered=true;
+ const q=SS.qs[SS.i];const ok=(v===q.a);
+ if(ok)SS.ok++;else SS.wrong.push(q);
+ if(!SS.mock)S.mark(q.id,ok);
+ $('oxm').disabled=true;$('oxb').disabled=true;
+ if(SS.mock){nextQ();return;}
+ const e=q.e?`<div class="fbe">${q.e}</div>`:`<div class="fbe">正解は「${q.a?'○ 正しい':'× まちがい'}」。くわしい解説はコーチに確認してみよう。</div>`;
+ $('fb').innerHTML=`<div class="fb ${ok?'ok':'ng'}">${mascot(ok?'happy':'sad',64)}<div><div class="fbt">${ok?'せいかい！':'ざんねん…'}</div>${e}<div class="src">📖 ${QMETA.chapters.find(c=>c.key===q.ch).sub}${q.id?`・${q.id}`:''}</div></div></div>`;
+ $('nx').innerHTML=`<button class="btn" onclick="nextQ()">つぎへ</button>`;
+ S.touchStreak();$('stk').textContent=S.streak;
+}
+function nextQ(){
+ if(SS.i<SS.qs.length-1){SS.i++;renderQ();}
+ else finish();
+}
+function finish(){
+ if(SS.timerId)clearInterval(SS.timerId);
+ const n=SS.qs.length,ok=SS.ok;
+ let h='';
+ if(SS.mock){
+   const pass=ok>=45;
+   if(ok>S.best)S.best=ok;
+   S.addMock({d:new Date().toISOString().slice(0,10),s:ok});
+   SS.wrong.forEach(q=>S.mark(q.id,false));
+   h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(pass?'happy':'sad',110)}<h2 class="${pass?'pass':'fail'}">${pass?'ごうかく！':'あと少し！'}</h2><div class="sc">${ok}<small> /${n}点</small></div><p>合格ライン 45点 ${pass?'クリア！本番もこの調子！':`まで あと${45-ok}点。にがてを潰せば届くよ`}</p></div>`;
+   if(SS.wrong.length){h+=`<div class="wronglist"><div class="secttl">まちがえた問題（にがてに登録したよ）</div>`;
+     SS.wrong.forEach(q=>{h+=`<div class="wrow" onclick='showQ("${q.id}")'><span class="no">${q.id||'—'}</span> ${q.q.slice(0,44)}…</div>`;});h+=`</div>`;}
+   h+=`<div class="nextwrap"><button class="btn" onclick="closeStudy()">おわる</button></div></div>`;
+ }else{
+   const pct=Math.round(ok/n*100);
+   const mood=pct>=80?'happy':(pct>=50?'normal':'sad');
+   const cmt=pct>=90?'ほぼ完ぺき！この章は任せた！':pct>=70?'いい感じ！にがてだけ復習しよう':'だいじょうぶ、繰り返せば必ず覚える！';
+   h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(mood,110)}<h2>おつかれさま！</h2><div class="sc">${ok}<small> /${n}問 せいかい</small></div><p>${cmt}</p></div><div class="nextwrap">${SS.wrong.length?`<button class="btn yellow" onclick="openStudy(shuffle(SS.wrong),'まちがい直し',false)">🔁 まちがえた${SS.wrong.length}問をもう一度</button><div style="height:10px"></div>`:''}<button class="btn" onclick="closeStudy()">おわる</button></div></div>`;
+ }
+ $('study').innerHTML=h;scrollTo(0,0);
+}
+/* ---------- mock tab ---------- */
+function mock(){
+ const hist=S.mocks.slice(-5).reverse();
+ let h=`<div class="hello"><span class="msc">${mascot('normal',86)}</span><div class="bubble">本番とおなじ<b>50問・40分</b>。<b>45点</b>で合格だよ。じゅんびはいい？</div></div>
+ <div class="card"><div style="font-size:14px;font-weight:800;margin-bottom:8px">📝 もぎ試験のルール</div>
+ <div style="font-size:12.5px;color:var(--sub);font-weight:700;line-height:2">・全${QUESTIONS.length}問からランダムに50問<br>・制限時間40分（本番と同じ）<br>・とちゅうの答え合わせなし（本番と同じ）<br>・まちがえた問題は自動で「にがて」に登録</div></div>
+ <div style="height:14px"></div><button class="btn" onclick="startMock()">🔥 もぎ試験にちょうせん</button>`;
+ if(hist.length){h+=`<div class="secttl">これまでの記録</div>`;hist.forEach(m=>{h+=`<div class="chrow"><span class="em">${m.s>=45?'🏆':'📄'}</span><div><div class="nm">${m.s} /50点 ${m.s>=45?'ごうかく！':''}</div><div class="sb">${m.d}</div></div></div>`;});}
+ $('tab-mock').innerHTML=h;
+}
+/* ---------- library ---------- */
+function lib(){
+ let h=`<div class="secttl" style="margin-top:6px">📚 ルールの図書館</div><div class="libdesc">JLA公式ルールブック（2026年度版）の章立てそのままの本棚だよ。気になる章をひらいてみて。</div><div class="shelf">`;
+ QMETA.chapters.forEach(c=>{h+=`<div class="book" onclick="openBook('${c.key}')"><span class="em">${CH_EMOJI[c.key]}</span><div class="nm">${c.name}</div><div class="ct">${c.sub}・${c.count}問</div></div>`;});
+ h+=`</div><div style="height:14px"></div><div class="card" style="font-size:12px;color:var(--sub);font-weight:700">📕 このアプリの問題と解説は、部で使われてきた審判試験QAシートと、JLA公式ルールブック2026年度版（第2版）がもとになっているよ。最終確認はかならず公式ルールブックでね。</div>`;
+ $('tab-lib').innerHTML=h;
+}
+function openBook(k){
+ const c=QMETA.chapters.find(x=>x.key===k);
+ const s=S.seen;
+ let h=`<div class="shin"><div class="shhead"><span style="font-size:24px">${CH_EMOJI[k]}</span><span class="t">${c.name}</span><button onclick="closeSheet()">✕</button></div><div class="shbody">
+ <div class="card" style="margin-bottom:12px"><div style="font-size:11px;font-weight:800;color:var(--mut)">${c.sub}</div><div style="font-size:13px;font-weight:700;margin-top:4px">${CH_DESC[k]}</div></div>
+ <button class="btn sm" onclick="closeSheet();startChapter('${k}')">この章を勉強する（${c.count}問）</button><div style="height:14px"></div>`;
+ byCh(k).forEach(q=>{
+   const st=s[q.id]?(S.nigate.includes(q.id)?'<span class="st ng">にがて</span>':'<span class="st ok">クリア</span>'):'<span class="st no">未挑戦</span>';
+   h+=`<div class="qitem" onclick='showQ("${q.id}")'><div class="no">${q.id||'—'} ${st}</div><div class="qq">${q.q.slice(0,52)}${q.q.length>52?'…':''}</div></div>`;
+ });
+ h+=`</div></div>`;
+ $('sheet').innerHTML=h;$('sheet').classList.remove('hidden');document.body.style.overflow='hidden';
+ $('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet();};
+}
+function showQ(id){
+ const q=QUESTIONS.find(x=>x.id===id);if(!q)return;
+ const c=QMETA.chapters.find(x=>x.key===q.ch);
+ let h=`<div class="shin"><div class="shhead"><span class="t">${q.id||'問題'}</span><button onclick="closeSheet()">✕</button></div><div class="shbody">
+ <div class="qcard" style="font-size:14px">${q.q}</div>
+ <div class="fb ${q.a?'ok':'ng'}" style="margin-top:12px"><div><div class="fbt">こたえ: ${q.a?'○ 正しい':'× まちがい'}</div>${q.e?`<div class="fbe">${q.e}</div>`:''}<div class="src">📖 ${c.sub}</div></div></div>
+ </div></div>`;
+ $('sheet').innerHTML=h;$('sheet').classList.remove('hidden');document.body.style.overflow='hidden';
+ $('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet();};
+}
+function closeSheet(){$('sheet').classList.add('hidden');document.body.style.overflow='';}
+/* ---------- record ---------- */
+function rec(){
+ const done=totalOk(),total=QUESTIONS.length;
+ const pct=Math.round(done/total*100);
+ let h=`<div class="hello"><span class="msc">${mascot(pct>=80?'happy':'normal',86)}</span><div class="bubble">ぜんたいの<b>${pct}%</b>をクリア！${pct>=80?'本番いけるよ！':'この調子！'}</div></div>
+ <div class="bigstat"><div class="stat"><div class="v">${S.streak}<small> 日</small></div><div class="l">連続べんきょう</div></div><div class="stat"><div class="v">${done}<small> /${total}</small></div><div class="l">クリア</div></div><div class="stat"><div class="v">${S.nigate.length}</div><div class="l">にがて</div></div></div>
+ <div class="secttl">章べつのせいちょう</div>`;
+ QMETA.chapters.forEach(c=>{
+   const p=c.count?Math.round(okCount(c.key)/c.count*100):0;
+   h+=`<div class="chrow" onclick="startChapter('${c.key}')"><span class="em">${CH_EMOJI[c.key]}</span><div style="flex:1"><div class="nm">${c.name}</div><div class="pbar" style="height:9px;margin-top:5px"><i style="width:${p}%;background:var(--green)"></i></div></div><span style="font-size:12px;font-weight:800;color:var(--green);min-width:38px;text-align:right">${p}%</span></div>`;
+ });
+ if(S.nigate.length){
+   h+=`<div style="height:8px"></div><button class="btn yellow" onclick="startNigate()">💪 にがてをやっつける（${S.nigate.length}問）</button>`;
+ }
+ $('tab-rec').innerHTML=h;
+}
+/* ---------- init ---------- */
+home();
+</script>
+</body>
+</html>
