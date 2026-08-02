@@ -187,8 +187,8 @@ const S={
    return (last===today||last===y)?+(localStorage.wh_stk||0):0;}
 };
 const byCh=k=>QUESTIONS.filter(q=>q.ch===k);
-const okCount=k=>{const s=S.seen;return byCh(k).filter(q=>s[q.id]&&s[q.id].ok>0).length;};
-const totalOk=()=>{const s=S.seen;return QUESTIONS.filter(q=>s[q.id]&&s[q.id].ok>0).length;};
+const okCount=k=>{const s=S.seen;return byCh(k).filter(q=>s[q.u]&&s[q.u].ok>0).length;};
+const totalOk=()=>{const s=S.seen;return QUESTIONS.filter(q=>s[q.u]&&s[q.u].ok>0).length;};
 /* ---------- mascot ---------- */
 function mascot(mood,size){
  const face={normal:'<circle cx="41" cy="46" r="3.6" fill="#463F33"/><circle cx="63" cy="46" r="3.6" fill="#463F33"/><path d="M44 58 Q52 64 60 58" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/>',
@@ -238,13 +238,13 @@ let SS=null;
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function startDaily(){
  const s=S.seen;
- const fresh=shuffle(QUESTIONS.filter(q=>!s[q.id]));
- const rest=shuffle(QUESTIONS.filter(q=>s[q.id]));
+ const fresh=shuffle(QUESTIONS.filter(q=>!s[q.u]));
+ const rest=shuffle(QUESTIONS.filter(q=>s[q.u]));
  openStudy(fresh.concat(rest).slice(0,10),'きょうの10問',false);
 }
 function startNigate(){
  const ids=new Set(S.nigate);
- openStudy(shuffle(QUESTIONS.filter(q=>ids.has(q.id))).slice(0,10),'にがて復習',false);
+ openStudy(shuffle(QUESTIONS.filter(q=>ids.has(q.u))).slice(0,10),'にがて復習',false);
 }
 function startChapter(k){openStudy(shuffle(byCh(k)),QMETA.chapters.find(c=>c.key===k).name,false);}
 function startMock(){openStudy(shuffle(QUESTIONS).slice(0,50),'もぎ試験',true);}
@@ -278,7 +278,7 @@ function answer(v){
  if(SS.answered)return;SS.answered=true;
  const q=SS.qs[SS.i];const ok=(v===q.a);
  if(ok)SS.ok++;else SS.wrong.push(q);
- if(!SS.mock)S.mark(q.id,ok);
+ if(!SS.mock)S.mark(q.u,ok);
  $('oxm').disabled=true;$('oxb').disabled=true;
  if(SS.mock){nextQ();return;}
  const e=q.e?`<div class="fbe">${q.e}</div>`:`<div class="fbe">正解は「${q.a?'○ 正しい':'× まちがい'}」。くわしい解説はコーチに確認してみよう。</div>`;
@@ -298,10 +298,10 @@ function finish(){
    const pass=ok>=45;
    if(ok>S.best)S.best=ok;
    S.addMock({d:new Date().toISOString().slice(0,10),s:ok});
-   SS.wrong.forEach(q=>S.mark(q.id,false));
+   SS.wrong.forEach(q=>S.mark(q.u,false));
    h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(pass?'happy':'sad',110)}<h2 class="${pass?'pass':'fail'}">${pass?'ごうかく！':'あと少し！'}</h2><div class="sc">${ok}<small> /${n}点</small></div><p>合格ライン 45点 ${pass?'クリア！本番もこの調子！':`まで あと${45-ok}点。にがてを潰せば届くよ`}</p></div>`;
    if(SS.wrong.length){h+=`<div class="wronglist"><div class="secttl">まちがえた問題（にがてに登録したよ）</div>`;
-     SS.wrong.forEach(q=>{h+=`<div class="wrow" onclick='showQ("${q.id}")'><span class="no">${q.id||'—'}</span> ${q.q.slice(0,44)}…</div>`;});h+=`</div>`;}
+     SS.wrong.forEach(q=>{h+=`<div class="wrow" onclick='showQ(${q.u})'><span class="no">${q.id||'—'}</span> ${q.q.slice(0,44)}…</div>`;});h+=`</div>`;}
    h+=`<div class="nextwrap"><button class="btn" onclick="closeStudy()">おわる</button></div></div>`;
  }else{
    const pct=Math.round(ok/n*100);
@@ -335,15 +335,15 @@ function openBook(k){
  <div class="card" style="margin-bottom:12px"><div style="font-size:11px;font-weight:800;color:var(--mut)">${c.sub}</div><div style="font-size:13px;font-weight:700;margin-top:4px">${CH_DESC[k]}</div></div>
  <button class="btn sm" onclick="closeSheet();startChapter('${k}')">この章を勉強する（${c.count}問）</button><div style="height:14px"></div>`;
  byCh(k).forEach(q=>{
-   const st=s[q.id]?(S.nigate.includes(q.id)?'<span class="st ng">にがて</span>':'<span class="st ok">クリア</span>'):'<span class="st no">未挑戦</span>';
-   h+=`<div class="qitem" onclick='showQ("${q.id}")'><div class="no">${q.id||'—'} ${st}</div><div class="qq">${q.q.slice(0,52)}${q.q.length>52?'…':''}</div></div>`;
+   const st=s[q.u]?(S.nigate.includes(q.u)?'<span class="st ng">にがて</span>':'<span class="st ok">クリア</span>'):'<span class="st no">未挑戦</span>';
+   h+=`<div class="qitem" onclick='showQ(${q.u})'><div class="no">${q.id||'—'} ${st}</div><div class="qq">${q.q.slice(0,52)}${q.q.length>52?'…':''}</div></div>`;
  });
  h+=`</div></div>`;
  $('sheet').innerHTML=h;$('sheet').classList.remove('hidden');document.body.style.overflow='hidden';
  $('sheet').onclick=e=>{if(e.target.id==='sheet')closeSheet();};
 }
-function showQ(id){
- const q=QUESTIONS.find(x=>x.id===id);if(!q)return;
+function showQ(u){
+ const q=QUESTIONS[u];if(!q)return;
  const c=QMETA.chapters.find(x=>x.key===q.ch);
  let h=`<div class="shin"><div class="shhead"><span class="t">${q.id||'問題'}</span><button onclick="closeSheet()">✕</button></div><div class="shbody">
  <div class="qcard" style="font-size:14px">${q.q}</div>
@@ -370,6 +370,7 @@ function rec(){
  $('tab-rec').innerHTML=h;
 }
 /* ---------- init ---------- */
+QUESTIONS.forEach((q,i)=>q.u=i);
 home();
 </script>
 </body>
