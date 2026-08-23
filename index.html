@@ -87,6 +87,14 @@ b,strong,h1,h2,h3{font-weight:800}
 .ox.batu{background:var(--coral-l);color:var(--coral-d);box-shadow:0 5px 0 #F2CFC7}
 .ox:active{transform:translateY(4px);box-shadow:none}
 .ox[disabled]{opacity:.45;pointer-events:none}
+.ox{border:3px solid transparent}
+.ox.maru.sel{border-color:var(--green-d)}
+.ox.batu.sel{border-color:var(--coral-d)}
+.navstrip{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 10px;scrollbar-width:none;margin-bottom:4px}
+.navstrip::-webkit-scrollbar{display:none}
+.nchip{min-width:36px;height:36px;border-radius:11px;border:2px solid var(--line);background:var(--paper);color:var(--mut);font-weight:800;font-size:12.5px;font-family:inherit;cursor:pointer;flex-shrink:0}
+.nchip.done{background:var(--green-l);border-color:#C8E5D3;color:var(--green-d)}
+.nchip.on{border-color:var(--green);color:var(--green-d)}
 /* feedback */
 .fb{border-radius:22px;padding:16px 18px;margin-top:16px;display:flex;gap:14px;align-items:flex-start;animation:pop .3s ease}
 .fb.ok{background:var(--green-l)}
@@ -155,7 +163,7 @@ b,strong,h1,h2,h3{font-weight:800}
 <div id="study" class="hidden"></div>
 <div id="sheet" class="hidden"></div>
 
-<script src="questions.js"></script>
+<script src="questions.js?v=2"></script>
 <script>
 const $=id=>document.getElementById(id);
 const CH_EMOJI={c15:'🏟️',c6:'🥍',c7:'🔄',c8:'🥅',c9:'⚠️',c10:'🚨',c11:'🟥',c12:'⏱️',c13:'✨'};
@@ -250,7 +258,7 @@ function startChapter(k){openStudy(shuffle(byCh(k)),QMETA.chapters.find(c=>c.key
 function startMock(){openStudy(shuffle(QUESTIONS).slice(0,50),'もぎ試験',true);}
 function openStudy(qs,title,isMock){
  if(!qs.length)return;
- SS={qs,i:0,ok:0,wrong:[],title,mock:isMock,answered:false,deadline:isMock?Date.now()+40*60*1000:null,timerId:null};
+ SS={qs,i:0,ok:0,wrong:[],title,mock:isMock,answered:false,ans:isMock?Array(qs.length).fill(null):null,deadline:isMock?Date.now()+40*60*1000:null,timerId:null};
  $('study').classList.remove('hidden');document.body.style.overflow='hidden';
  if(isMock)SS.timerId=setInterval(tick,1000);
  renderQ();
@@ -260,9 +268,10 @@ function tick(){
  if(!SS)return;
  const left=Math.max(0,SS.deadline-Date.now());
  const el=$('tmr');if(el){const m=Math.floor(left/60000),s=Math.floor(left%60000/1000);el.textContent=`${m}:${String(s).padStart(2,'0')}`;el.classList.toggle('warn',left<5*60*1000);}
- if(left<=0){clearInterval(SS.timerId);finish();}
+ if(left<=0){clearInterval(SS.timerId);submitMock(true);}
 }
 function renderQ(){
+ if(SS.mock){renderMockQ();return;}
  const q=SS.qs[SS.i];
  const pct=Math.round(SS.i/SS.qs.length*100);
  let h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:${pct}%"></i></div>${SS.mock?`<span class="timer" id="tmr">40:00</span>`:`<span class="timer">${SS.i+1}/${SS.qs.length}</span>`}</div>
@@ -278,9 +287,8 @@ function answer(v){
  if(SS.answered)return;SS.answered=true;
  const q=SS.qs[SS.i];const ok=(v===q.a);
  if(ok)SS.ok++;else SS.wrong.push(q);
- if(!SS.mock)S.mark(q.u,ok);
+ S.mark(q.u,ok);
  $('oxm').disabled=true;$('oxb').disabled=true;
- if(SS.mock){nextQ();return;}
  const e=q.e?`<div class="fbe">${q.e}</div>`:`<div class="fbe">正解は「${q.a?'○ 正しい':'× まちがい'}」。くわしい解説はコーチに確認してみよう。</div>`;
  $('fb').innerHTML=`<div class="fb ${ok?'ok':'ng'}">${mascot(ok?'happy':'sad',64)}<div><div class="fbt">${ok?'せいかい！':'ざんねん…'}</div>${e}<div class="src">📖 ${QMETA.chapters.find(c=>c.key===q.ch).sub}${q.id?`・${q.id}`:''}</div></div></div>`;
  $('nx').innerHTML=`<button class="btn" onclick="nextQ()">つぎへ</button>`;
@@ -309,6 +317,51 @@ function finish(){
    const cmt=pct>=90?'ほぼ完ぺき！この章は任せた！':pct>=70?'いい感じ！にがてだけ復習しよう':'だいじょうぶ、繰り返せば必ず覚える！';
    h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(mood,110)}<h2>おつかれさま！</h2><div class="sc">${ok}<small> /${n}問 せいかい</small></div><p>${cmt}</p></div><div class="nextwrap">${SS.wrong.length?`<button class="btn yellow" onclick="openStudy(shuffle(SS.wrong),'まちがい直し',false)">🔁 まちがえた${SS.wrong.length}問をもう一度</button><div style="height:10px"></div>`:''}<button class="btn" onclick="closeStudy()">おわる</button></div></div>`;
  }
+ $('study').innerHTML=h;scrollTo(0,0);
+}
+/* ---------- 模擬: 本番形式（戻れる・解き直せる） ---------- */
+function renderMockQ(){
+ const q=SS.qs[SS.i];const n=SS.qs.length;
+ const answered=SS.ans.filter(x=>x!==null).length;
+ const pct=Math.round(answered/n*100);
+ let chips='';
+ for(let j=0;j<n;j++){chips+=`<button class="nchip ${j===SS.i?'on':(SS.ans[j]!==null?'done':'')}" onclick="navJump(${j})">${j+1}</button>`;}
+ const my=SS.ans[SS.i];
+ $('study').innerHTML=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:${pct}%"></i></div><span class="timer" id="tmr">--:--</span></div>
+ <div class="swrap"><div class="navstrip" id="nstrip">${chips}</div>
+ <div class="qmeta"><span class="pill g">だい ${SS.i+1} 問 / ${n}問</span><span class="pill">こたえた ${answered}/${n}</span></div>
+ <div class="qcard">${q.q}</div>
+ <div class="oxrow"><button class="ox maru ${my===1?'sel':''}" onclick="mockPick(1)"><span class="mk">○</span>正しい</button><button class="ox batu ${my===0?'sel':''}" onclick="mockPick(0)"><span class="mk">×</span>まちがい</button></div>
+ <div class="nextwrap"><button class="btn ${answered===n?'':'ghost'}" onclick="submitMock(false)">さいてんする${answered<n?`（のこり${n-answered}問）`:''}</button></div></div>`;
+ const cur=document.querySelector('.nchip.on');if(cur)cur.scrollIntoView({inline:'center',block:'nearest'});
+ tick();
+}
+function mockPick(v){
+ SS.ans[SS.i]=v;
+ const n=SS.qs.length;
+ let nx=-1;
+ for(let k=1;k<=n;k++){const j=(SS.i+k)%n;if(SS.ans[j]===null){nx=j;break;}}
+ if(nx>=0)SS.i=nx;
+ renderMockQ();
+}
+function navJump(j){SS.i=j;renderMockQ();}
+function submitMock(force){
+ if(!SS||!SS.mock)return;
+ const n=SS.qs.length;
+ const un=SS.ans.filter(x=>x===null).length;
+ if(!force&&un>0&&!confirm(`まだ答えていない問題が${un}問あるよ。このまま採点する？`))return;
+ if(SS.timerId)clearInterval(SS.timerId);
+ let ok=0;const wrong=[];
+ SS.qs.forEach((q,j)=>{if(SS.ans[j]===q.a)ok++;else wrong.push(q);});
+ const pass=ok>=45;
+ if(ok>S.best)S.best=ok;
+ S.addMock({d:new Date().toISOString().slice(0,10),s:ok});
+ wrong.forEach(q=>S.mark(q.u,false));
+ S.touchStreak();
+ let h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(pass?'happy':'sad',110)}<h2 class="${pass?'pass':'fail'}">${pass?'ごうかく！':'あと少し！'}</h2><div class="sc">${ok}<small> /${n}点</small></div><p>合格ライン 45点 ${pass?'クリア！本番もこの調子！':`まで あと${45-ok}点。にがてを潰せば届くよ`}${un>0?`（未回答 ${un}問）`:''}</p></div>`;
+ if(wrong.length){h+=`<div class="wronglist"><div class="secttl">まちがえた問題（にがてに登録したよ）</div>`;
+   wrong.forEach(q=>{h+=`<div class="wrow" onclick='showQ(${q.u})'><span class="no">${q.id||'—'}</span> ${q.q.slice(0,44)}…</div>`;});h+=`</div>`;}
+ h+=`<div class="nextwrap"><button class="btn" onclick="closeStudy()">おわる</button></div></div>`;
  $('study').innerHTML=h;scrollTo(0,0);
 }
 /* ---------- mock tab ---------- */
