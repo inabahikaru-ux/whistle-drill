@@ -163,7 +163,7 @@ b,strong,h1,h2,h3{font-weight:800}
 <div id="study" class="hidden"></div>
 <div id="sheet" class="hidden"></div>
 
-<script src="questions.js?v=2"></script>
+<script src="questions.js?v=3"></script>
 <script>
 const $=id=>document.getElementById(id);
 const CH_EMOJI={c15:'🏟️',c6:'🥍',c7:'🔄',c8:'🥅',c9:'⚠️',c10:'🚨',c11:'🟥',c12:'⏱️',c13:'✨'};
@@ -180,11 +180,11 @@ const CH_DESC={
 };
 /* ---------- state ---------- */
 const S={
- get seen(){return JSON.parse(localStorage.wh_seen||'{}')},
- set seen(v){localStorage.wh_seen=JSON.stringify(v)},
+ get seen(){return JSON.parse(localStorage.wh2_seen||'{}')},
+ set seen(v){localStorage.wh2_seen=JSON.stringify(v)},
  mark(id,ok){const s=this.seen;s[id]=s[id]||{ok:0,ng:0};ok?s[id].ok++:s[id].ng++;this.seen=s;
-   const n=new Set(JSON.parse(localStorage.wh_ng||'[]'));ok?n.delete(id):n.add(id);localStorage.wh_ng=JSON.stringify([...n]);},
- get nigate(){return JSON.parse(localStorage.wh_ng||'[]')},
+   const n=new Set(JSON.parse(localStorage.wh2_ng||'[]'));ok?n.delete(id):n.add(id);localStorage.wh2_ng=JSON.stringify([...n]);},
+ get nigate(){return JSON.parse(localStorage.wh2_ng||'[]')},
  get best(){return +(localStorage.wh_best||0)}, set best(v){localStorage.wh_best=v},
  get mocks(){return JSON.parse(localStorage.wh_mocks||'[]')}, addMock(r){const m=this.mocks;m.push(r);localStorage.wh_mocks=JSON.stringify(m.slice(-20));},
  touchStreak(){const today=new Date().toDateString();const last=localStorage.wh_last;let st=+(localStorage.wh_stk||0);
@@ -195,8 +195,8 @@ const S={
    return (last===today||last===y)?+(localStorage.wh_stk||0):0;}
 };
 const byCh=k=>QUESTIONS.filter(q=>q.ch===k);
-const okCount=k=>{const s=S.seen;return byCh(k).filter(q=>s[q.u]&&s[q.u].ok>0).length;};
-const totalOk=()=>{const s=S.seen;return QUESTIONS.filter(q=>s[q.u]&&s[q.u].ok>0).length;};
+const okCount=k=>{const s=S.seen;return byCh(k).filter(q=>s[q.k]&&s[q.k].ok>0).length;};
+const totalOk=()=>{const s=S.seen;return QUESTIONS.filter(q=>s[q.k]&&s[q.k].ok>0).length;};
 /* ---------- mascot ---------- */
 function mascot(mood,size){
  const face={normal:'<circle cx="41" cy="46" r="3.6" fill="#463F33"/><circle cx="63" cy="46" r="3.6" fill="#463F33"/><path d="M44 58 Q52 64 60 58" stroke="#463F33" stroke-width="3" fill="none" stroke-linecap="round"/>',
@@ -246,13 +246,13 @@ let SS=null;
 function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
 function startDaily(){
  const s=S.seen;
- const fresh=shuffle(QUESTIONS.filter(q=>!s[q.u]));
- const rest=shuffle(QUESTIONS.filter(q=>s[q.u]));
+ const fresh=shuffle(QUESTIONS.filter(q=>!s[q.k]));
+ const rest=shuffle(QUESTIONS.filter(q=>s[q.k]));
  openStudy(fresh.concat(rest).slice(0,10),'きょうの10問',false);
 }
 function startNigate(){
  const ids=new Set(S.nigate);
- openStudy(shuffle(QUESTIONS.filter(q=>ids.has(q.u))).slice(0,10),'にがて復習',false);
+ openStudy(shuffle(QUESTIONS.filter(q=>ids.has(q.k))).slice(0,10),'にがて復習',false);
 }
 function startChapter(k){openStudy(shuffle(byCh(k)),QMETA.chapters.find(c=>c.key===k).name,false);}
 function startMock(){openStudy(shuffle(QUESTIONS).slice(0,50),'もぎ試験',true);}
@@ -287,7 +287,7 @@ function answer(v){
  if(SS.answered)return;SS.answered=true;
  const q=SS.qs[SS.i];const ok=(v===q.a);
  if(ok)SS.ok++;else SS.wrong.push(q);
- S.mark(q.u,ok);
+ S.mark(q.k,ok);
  $('oxm').disabled=true;$('oxb').disabled=true;
  const e=q.e?`<div class="fbe">${q.e}</div>`:`<div class="fbe">正解は「${q.a?'○ 正しい':'× まちがい'}」。くわしい解説はコーチに確認してみよう。</div>`;
  $('fb').innerHTML=`<div class="fb ${ok?'ok':'ng'}">${mascot(ok?'happy':'sad',64)}<div><div class="fbt">${ok?'せいかい！':'ざんねん…'}</div>${e}<div class="src">📖 ${QMETA.chapters.find(c=>c.key===q.ch).sub}${q.id?`・${q.id}`:''}</div></div></div>`;
@@ -306,7 +306,7 @@ function finish(){
    const pass=ok>=45;
    if(ok>S.best)S.best=ok;
    S.addMock({d:new Date().toISOString().slice(0,10),s:ok});
-   SS.wrong.forEach(q=>S.mark(q.u,false));
+   SS.wrong.forEach(q=>S.mark(q.k,false));
    h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(pass?'happy':'sad',110)}<h2 class="${pass?'pass':'fail'}">${pass?'ごうかく！':'あと少し！'}</h2><div class="sc">${ok}<small> /${n}点</small></div><p>合格ライン 45点 ${pass?'クリア！本番もこの調子！':`まで あと${45-ok}点。にがてを潰せば届くよ`}</p></div>`;
    if(SS.wrong.length){h+=`<div class="wronglist"><div class="secttl">まちがえた問題（にがてに登録したよ）</div>`;
      SS.wrong.forEach(q=>{h+=`<div class="wrow" onclick='showQ(${q.u})'><span class="no">${q.id||'—'}</span> ${q.q.slice(0,44)}…</div>`;});h+=`</div>`;}
@@ -356,7 +356,7 @@ function submitMock(force){
  const pass=ok>=45;
  if(ok>S.best)S.best=ok;
  S.addMock({d:new Date().toISOString().slice(0,10),s:ok});
- wrong.forEach(q=>S.mark(q.u,false));
+ wrong.forEach(q=>S.mark(q.k,false));
  S.touchStreak();
  let h=`<div class="stop"><button onclick="closeStudy()">✕</button><div class="pbar"><i style="width:100%"></i></div></div><div class="swrap"><div class="result">${mascot(pass?'happy':'sad',110)}<h2 class="${pass?'pass':'fail'}">${pass?'ごうかく！':'あと少し！'}</h2><div class="sc">${ok}<small> /${n}点</small></div><p>合格ライン 45点 ${pass?'クリア！本番もこの調子！':`まで あと${45-ok}点。にがてを潰せば届くよ`}${un>0?`（未回答 ${un}問）`:''}</p></div>`;
  if(wrong.length){h+=`<div class="wronglist"><div class="secttl">まちがえた問題（にがてに登録したよ）</div>`;
@@ -388,7 +388,7 @@ function openBook(k){
  <div class="card" style="margin-bottom:12px"><div style="font-size:11px;font-weight:800;color:var(--mut)">${c.sub}</div><div style="font-size:13px;font-weight:700;margin-top:4px">${CH_DESC[k]}</div></div>
  <button class="btn sm" onclick="closeSheet();startChapter('${k}')">この章を勉強する（${c.count}問）</button><div style="height:14px"></div>`;
  byCh(k).forEach(q=>{
-   const st=s[q.u]?(S.nigate.includes(q.u)?'<span class="st ng">にがて</span>':'<span class="st ok">クリア</span>'):'<span class="st no">未挑戦</span>';
+   const st=s[q.k]?(S.nigate.includes(q.k)?'<span class="st ng">にがて</span>':'<span class="st ok">クリア</span>'):'<span class="st no">未挑戦</span>';
    h+=`<div class="qitem" onclick='showQ(${q.u})'><div class="no">${q.id||'—'} ${st}</div><div class="qq">${q.q.slice(0,52)}${q.q.length>52?'…':''}</div></div>`;
  });
  h+=`</div></div>`;
